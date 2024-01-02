@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tsinghua E-Reserves Lib Downloader
 // @namespace    anyi.fan
-// @version      0.1.1
+// @version      0.2.0
 // @license      GPL-3.0 License
 // @description  Download PDF from Tsinghua University Electronic Course Reserves Service Platform
 // @author       A1phaN
@@ -82,6 +82,7 @@ const getImage = async (url, retry = MAX_RETRY) => {
     try {
       button.onclick = null;
       let doc = null;
+      let page = 1;
       const chapters = await (
         await fetch(
           '/readkernel/KernelAPI/BookInfo/selectJgpBookChapters',
@@ -138,6 +139,8 @@ const getImage = async (url, retry = MAX_RETRY) => {
             return;
           }
         }
+        doc.outline.add(null, chapter.EFRAGMENTNAME, { pageNumber: page });
+        page += chapterData.data.JGPS.length;
       }
       doc && doc.save(`${bookName}.pdf`);
       bookNameElement.innerText = `${bookName}（下载完成）`;
