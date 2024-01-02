@@ -1,6 +1,8 @@
 // ==UserScript==
 // @name         Tsinghua E-Reserves Lib Downloader
-// @version      0.1
+// @namespace    anyi.fan
+// @version      0.1.1
+// @license      GPL-3.0 License
 // @description  Download PDF from Tsinghua University Electronic Course Reserves Service Platform
 // @author       A1phaN
 // @match        https://ereserves.lib.tsinghua.edu.cn/readkernel/ReadJPG/JPGJsNetPage/*
@@ -53,7 +55,7 @@ const getImage = async (url, retry = MAX_RETRY) => {
 
   const button = document.createElement('span');
   button.className = 'fucBtn icon iconfont';
-  button.style = 'margin-left: 8px;position: relative;top:1px;';
+  button.style = 'margin-left: 8px; position: relative; top: 2px;';
   button.innerHTML =
   `<svg
     t="1703917701009"
@@ -129,6 +131,7 @@ const getImage = async (url, retry = MAX_RETRY) => {
               doc.addPage([img.width, img.height]);
             }
             doc.addImage(dataURL, 'JPEG', 0, 0, img.width, img.height);
+            bookNameElement.innerText = `${bookName}（正在获取第 ${chap + 1} 章，已完成: ${i + 1} / ${chapterData.data.JGPS.length}）`;
             await sleep(QUERY_INTERVAL);
           } catch(e) {
             alert(`Get page ${i + 1} of chapter ${chap + 1} ${chapter.EFRAGMENTNAME} failed!`);
