@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tsinghua E-Reserves Lib Downloader
 // @namespace    anyi.fan
-// @version      0.2.0
+// @version      0.2.1
 // @license      GPL-3.0 License
 // @description  Download PDF from Tsinghua University Electronic Course Reserves Service Platform
 // @author       A1phaN
@@ -125,7 +125,7 @@ const getImage = async (url, retry = MAX_RETRY) => {
         for (let i = 0; i < chapterData.data.JGPS.length; ++i) {
           const jpg = chapterData.data.JGPS[i];
           try {
-            const [img, dataURL] = await getImage(`/readkernel/JPGFile/DownJPGJsNetPage/${jpg.hfsKey}`);
+            const [img, dataURL] = await getImage(`/readkernel/JPGFile/DownJPGJsNetPage?filePath=${jpg.hfsKey}`);
             if (!doc) {
               doc = new jspdf.jsPDF({ format: [img.width, img.height], unit: 'px' });
             } else {
