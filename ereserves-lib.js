@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tsinghua E-Reserves Lib Downloader
 // @namespace    anyi.fan
-// @version      0.2.1
+// @version      0.2.2
 // @license      GPL-3.0 License
 // @description  Download PDF from Tsinghua University Electronic Course Reserves Service Platform
 // @author       A1phaN
@@ -142,7 +142,38 @@ const getImage = async (url, retry = MAX_RETRY) => {
         doc.outline.add(null, chapter.EFRAGMENTNAME, { pageNumber: page });
         page += chapterData.data.JGPS.length;
       }
-      doc && doc.save(`${bookName}.pdf`);
+      if (doc) {
+        const filename = `${bookName}.pdf`;
+        try {
+          doc.save(filename);
+        } catch(e) {
+          if (e instanceof RangeError && e.message === 'Invalid string length') {
+            // jsPDF exceeds the maximum string length
+            doc.__private__.resetCustomOutputDestination();
+            const content = doc.__private__.out('');
+            content.pop();
+            const blob = new Blob(
+              content.map((line, idx) => {
+                const str = idx === content.length - 1 ? line : line + '\n';
+                const arrayBuffer = new ArrayBuffer(str.length);
+                const uint8Array = new Uint8Array(arrayBuffer);
+                for (let i = 0; i < str.length; ++i) {
+                  uint8Array[i] = str.charCodeAt(i);
+                }
+                return arrayBuffer;
+              }),
+              { type: 'application/pdf' },
+            );
+            const a = document.createElement('a');
+            a.download = filename;
+            a.rel = 'noopener';
+            a.href = URL.createObjectURL(blob);
+            a.click();
+          } else {
+            alert(`Unexpected Error when saving pdf: ${e?.message ?? e}`);
+          }
+        }
+      }
       bookNameElement.innerText = `${bookName}（下载完成）`;
     } finally {
       button.onclick = downloadPDF;
